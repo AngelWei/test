@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+	.zoomify-dialog-pic {
+     position: fixed;
+     top: 0;
+     bottom: 0;
+     left: 0;
+     right: 0;
+     background: rgba(0,0,0,0.35);
+     z-index: 99999;
+     display: none;
+}
+
+.zoomify-dialog-pic .dialog-body {
+     
+      position:absolute;
+      width: 100%;
+      max-width: 250px;
+      max-height: 300px;
+      margin-top:-150px;/*div 高度的一半*/
+      margin-left:-125px;/*div 宽度的一半*/
+      top:50%;
+      left:50%;
+      padding:10px;
+      border-radius:5px;
+      background: white;
+}
+     
+.zoomify-dialog-pic .dialog-body img {
+     width: 100%;
+}
+
+.magnifier {
+  cursor: -moz-zoom-out;
+  cursor: -webkit-zoom-out;
+  cursor: zoom-out;
+  cursor:url('icon/magnifier.ico'),auto;
+}
+
+.un-magnifier {
+  cursor: -moz-zoom-in;
+  cursor: -webkit-zoom-in;
+  cursor: zoom-in;
+  cursor:url('icon/unmagnifier.ico'),auto;
+}
+</style>
+<script type="text/javascript" src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+	var ROOT = $("input[name='globalPath']").val();
+
+function zoomOut(orginImg,times){
+    
+    var obj=$(".zoomify-dialog-pic .dialog-body");
+    var img=$(".zoomify-dialog-pic .dialog-body img");
+
+    var imgW=$(orginImg).width();
+    var imgH=$(orginImg).height();
+
+    var newH=imgH*times;
+    var newW=imgW*times;
+    
+    var bodyH=$("body").height();
+    var bodyW=$("body").width();
+    
+    if(newW>bodyW){
+        newW=bodyW-40;
+        obj.css("padding","5px");
+    }
+    
+    if(newH>bodyH){
+        newH=bodyH-40;
+        obj.css("padding","5px");
+    }
+    
+    //图片新高度、宽度
+    img.css("width",newW+"px");
+    img.css("height",newH+"px");
+    
+    //容器新高度、宽度,因为图片放大了，所以容器也必须放大
+    //不要用 padding 属性，ie 下不支持
+    var padding=parseInt(obj.css("padding-top"));
+    
+    cWith=newW+padding*2;
+    cHeight=newH+padding*2;
+    
+    obj.css("max-width",cWith+"px");
+    obj.css("max-height",cHeight+"px");
+    
+    obj.css("margin-left",(cWith/2)*-1+"px");
+    obj.css("margin-top",(cHeight/2)*-1+"px");
+}
+
+function insertPic(url){
+    html='<div class="zoomify-dialog-pic">'+
+        '<div class="dialog-body">'+
+            '<img src="'+url+'" class="un-magnifier">'+
+        '</div>'+
+    '</div>';
+    return html;
+}
+
+$(".page-content-l").on('click','p img',function(){
+
+    var url=$(this).attr('src');
+    html=insertPic(url);
+    $("body").append(html);
+    
+    zoomOut(this,1.2);
+    $(".zoomify-dialog-pic").show();
+});
+
+$("html").on('click','.zoomify-dialog-pic',function(){
+    $(this).remove();
+});
+
+$(".page-content-l").on("mouseover mouseout","p img",function(event){
+    if(event.type == "mouseover"){
+        $(this).addClass("magnifier");
+    }else if(event.type == "mouseout"){
+        $(this).removeClass("magnifier");
+    }
+}); 
+</script>
+</head>
+<body>
+<div class="page-content-l">
+	<p>
+		<img src="http://pic44.nipic.com/20140724/19205345_170535881000_2.jpg">
+	</p>
+</div>
+</body>
+</html>
